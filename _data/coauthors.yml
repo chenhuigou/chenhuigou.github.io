@@ -1,34 +1,71 @@
-"adams":
-  - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
-    url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
+"rezatofighi":
+  - firstname: ["Hamid"]
+    url: https://scholar.google.com/citations?user=VkhYdVkAAAAJ
 
-"podolsky":
-  - firstname: ["Boris", "B.", "B. Y.", "Boris Yakovlevich"]
-    url: https://en.wikipedia.org/wiki/Boris_Podolsky
+"cai":
+  - firstname: ["Jianfei"]
+    url: https://scholar.google.com/citations?user=N6czCoUAAAAJ
 
-"rosen":
-  - firstname: ["Nathan", "N."]
-    url: https://en.wikipedia.org/wiki/Nathan_Rosen
+"fan":
+  - firstname: ["Haoqi"]
+    url: https://scholar.google.com/citations?user=OZnVfXoAAAAJ
 
-"bach":
-  - firstname: ["Johann Sebastian", "J. S."]
-    url: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+"elhoseiny":
+  - firstname: ["Mohamed"]
+    url: https://scholar.google.com/citations?user=iRBUTOAAAAAJ
 
-  - firstname: ["Carl Philipp Emanuel", "C. P. E."]
-    url: https://en.wikipedia.org/wiki/Carl_Philipp_Emanuel_Bach
+"zhu":
+  - firstname: ["Deyao"]
+    url: https://scholar.google.com/citations?user=example
 
-"przibram":
-  - firstname: ["Karl"]
-    url: https://link.springer.com/article/10.1007/s00016-019-00242-z
+"ma":
+  - firstname: ["Ziyu"]
+    url: https://scholar.google.com/citations?user=example
 
-"schrodinger":
-  - firstname: ["Erwin"]
-    url: https://en.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger
+"chen":
+  - firstname: ["Zilong"]
+    url: https://scholar.google.com/citations?user=example
 
-"lorentz":
-  - firstname: ["Hendrik Antoon"]
-    url: https://en.wikipedia.org/wiki/Hendrik_Lorentz
+  - firstname: ["Feng"]
+    url: https://scholar.google.com/citations?user=example
 
-"planck":
-  - firstname: ["Max"]
-    url: https://en.wikipedia.org/wiki/Max_Planck
+"wang":
+  - firstname: ["Zeyu"]
+    url: https://scholar.google.com/citations?user=example
+
+  - firstname: ["Jian"]
+    url: https://scholar.google.com/citations?user=example
+
+  - firstname: ["Jingdong"]
+    url: https://scholar.google.com/citations?user=example
+
+"zhuang":
+  - firstname: ["Bohan"]
+    url: https://scholar.google.com/citations?user=example
+
+"xie":
+  - firstname: ["Cihang"]
+    url: https://scholar.google.com/citations?user=example
+
+"li":
+  - firstname: ["Feng"]
+    url: https://scholar.google.com/citations?user=example
+
+  - firstname: ["Kunchang"]
+    url: https://scholar.google.com/citations?user=example
+
+"le":
+  - firstname: ["Duy-Tho"]
+    url: https://scholar.google.com/citations?user=example
+
+"zheng":
+  - firstname: ["Liang"]
+    url: https://scholar.google.com/citations?user=example
+
+"shi":
+  - firstname: ["Hengcan"]
+    url: https://scholar.google.com/citations?user=example
+
+"duan":
+  - firstname: ["Zicheng"]
+    url: https://scholar.google.com/citations?user=example
