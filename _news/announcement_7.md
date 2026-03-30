@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-Joined **ByteDance Seed VLM-BAGEL Group** as a research intern, supervised by Haoqi Fan.
+Joined **ByteDance Seed VLM-BAGEL Group** as a research intern.
