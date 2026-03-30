@@ -37,7 +37,7 @@
         window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
-    const count = Math.min(80, Math.floor((w * h) / 15000));
+    const count = Math.min(160, Math.floor((w * h) / 7000));
     particles = [];
 
     for (let i = 0; i < count; i++) {
