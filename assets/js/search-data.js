@@ -63,13 +63,7 @@ ninja.data = [{
           description: "",
           section: "Books",handler: () => {
               window.location.href = "/books/the_godfather/";
-            },},{id: "news-rtformer-accepted-as-a-spotlight-at-neurips-2022",
-          title: 'RTFormer accepted as a Spotlight at NeurIPS 2022.',
-          description: "",
-          section: "News",},{id: "news-co-organized-the-cvpr-2024-workshop-on-robot-visual-perception-in-human-crowded-environments-and-the-jrdb-panotrack-challenge",
-          title: 'Co-organized the CVPR 2024 Workshop on Robot Visual Perception in Human Crowded Environments...',
-          description: "",
-          section: "News",},{id: "news-bagel-emerging-properties-in-unified-multimodal-pretraining-released-reaching-5-5k-github-stars",
+            },},{id: "news-bagel-emerging-properties-in-unified-multimodal-pretraining-released-reaching-5-5k-github-stars",
           title: 'BAGEL (Emerging Properties in Unified Multimodal Pretraining) released, reaching 5.5k GitHub stars.',
           description: "",
           section: "News",},{id: "news-two-papers-accepted-at-cvpr-2026-vq-va-world-and-an-empirical-study-on-how-video-llms-answer-video-questions",
