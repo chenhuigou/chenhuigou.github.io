@@ -1,10 +1,67 @@
 /**
- * 1. Particle Background (Canvas-based, no dependencies)
+ * 1. Particle Background with shooting stars (dark) / floating bubbles (light)
  * 2. Mouse Cursor Glow Effect
+ * 3. Flowing Gradient Background
  */
 
 (function () {
   'use strict';
+
+  function isDark() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ||
+      document.body.classList.contains('dark') ||
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  // ===================== FLOWING GRADIENT BACKGROUND =====================
+  function initGradientBg() {
+    const el = document.createElement('div');
+    el.id = 'gradient-bg';
+    el.style.cssText =
+      'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;pointer-events:none;' +
+      'transition:opacity 0.8s ease;';
+    document.body.prepend(el);
+
+    function update() {
+      if (isDark()) {
+        el.style.background =
+          'linear-gradient(135deg, #0a0a1a 0%, #0d0d2b 25%, #1a0a2e 50%, #0a1628 75%, #0a0a1a 100%)';
+        el.style.backgroundSize = '400% 400%';
+      } else {
+        el.style.background =
+          'linear-gradient(135deg, #f5f0ff 0%, #e8f4fd 25%, #f0e6ff 50%, #e6f2ff 75%, #faf5ff 100%)';
+        el.style.backgroundSize = '400% 400%';
+      }
+      el.style.animation = 'gradientFlow 15s ease infinite';
+    }
+
+    // Inject keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes gradientFlow {
+        0% { background-position: 0% 50%; }
+        25% { background-position: 100% 0%; }
+        50% { background-position: 100% 100%; }
+        75% { background-position: 0% 100%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      @keyframes shootingStar {
+        0% { transform: translateX(0) translateY(0); opacity: 1; }
+        100% { transform: translateX(300px) translateY(300px); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
 
   // ===================== PARTICLE BACKGROUND =====================
   function initParticles() {
@@ -16,6 +73,8 @@
 
     const ctx = canvas.getContext('2d');
     let w, h, particles, mouse;
+    let shootingStars = [];
+    let lastShootTime = 0;
 
     mouse = { x: null, y: null };
     window.addEventListener('mousemove', function (e) {
@@ -30,13 +89,6 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Detect dark mode
-    function isDark() {
-      return document.documentElement.getAttribute('data-theme') === 'dark' ||
-        document.body.classList.contains('dark') ||
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-
     const count = Math.min(160, Math.floor((w * h) / 7000));
     particles = [];
 
@@ -47,57 +99,207 @@
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         r: Math.random() * 2 + 1,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinklePhase: Math.random() * Math.PI * 2,
+        // For light mode colored bubbles
+        hue: Math.random() * 60 + 220, // 220-280 (blue-purple range)
       });
     }
 
-    function draw() {
+    function spawnShootingStar() {
+      const side = Math.random();
+      let sx, sy, angle;
+      if (side < 0.5) {
+        sx = Math.random() * w;
+        sy = -10;
+        angle = Math.PI / 4 + (Math.random() - 0.5) * 0.5;
+      } else {
+        sx = -10;
+        sy = Math.random() * h * 0.5;
+        angle = Math.PI / 6 + (Math.random() - 0.5) * 0.3;
+      }
+      const speed = 4 + Math.random() * 4;
+      shootingStars.push({
+        x: sx, y: sy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.008 + Math.random() * 0.012,
+        length: 30 + Math.random() * 50,
+        width: 1 + Math.random() * 1.5,
+      });
+    }
+
+    function draw(now) {
       ctx.clearRect(0, 0, w, h);
       const dark = isDark();
-      const dotColor = dark ? 'rgba(255,255,255,' : 'rgba(100,100,180,';
-      const lineColor = dark ? 'rgba(255,255,255,' : 'rgba(100,100,180,';
 
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
+      // ---- DARK MODE: Starfield + Shooting Stars ----
+      if (dark) {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx * 0.3; // slower in dark mode for star feel
+          p.y += p.vy * 0.3;
 
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
 
-        // Draw dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = dotColor + '0.5)';
-        ctx.fill();
+          // Twinkle
+          p.twinklePhase += p.twinkleSpeed;
+          const alpha = 0.3 + Math.sin(p.twinklePhase) * 0.35 + 0.35;
 
-        // Connect nearby particles
-        for (let j = i + 1; j < particles.length; j++) {
-          const q = particles[j];
-          const dx = p.x - q.x;
-          const dy = p.y - q.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = lineColor + (1 - dist / 120) * 0.2 + ')';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+          // Star glow
+          const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+          gradient.addColorStop(0, 'rgba(200,210,255,' + alpha + ')');
+          gradient.addColorStop(0.5, 'rgba(150,170,255,' + alpha * 0.3 + ')');
+          gradient.addColorStop(1, 'rgba(150,170,255,0)');
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+
+          // Star core
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(240,245,255,' + alpha + ')';
+          ctx.fill();
+
+          // Connect nearby (subtle constellation lines)
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(100,120,200,' + (1 - dist / 100) * 0.12 + ')';
+              ctx.lineWidth = 0.4;
+              ctx.stroke();
+            }
+          }
+
+          // Connect to mouse
+          if (mouse.x !== null) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 200) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.strokeStyle = 'rgba(160,170,255,' + (1 - dist / 200) * 0.3 + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
         }
 
-        // Connect to mouse
-        if (mouse.x !== null) {
-          const dx = p.x - mouse.x;
-          const dy = p.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 200) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = lineColor + (1 - dist / 200) * 0.35 + ')';
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
+        // Shooting stars
+        if (now - lastShootTime > 3000 + Math.random() * 5000) {
+          spawnShootingStar();
+          lastShootTime = now;
+        }
+
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+          const s = shootingStars[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.life -= s.decay;
+
+          if (s.life <= 0 || s.x > w + 50 || s.y > h + 50) {
+            shootingStars.splice(i, 1);
+            continue;
+          }
+
+          const tailX = s.x - s.vx * s.length / Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 0.5;
+          const tailY = s.y - s.vy * s.length / Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 0.5;
+
+          const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
+          grad.addColorStop(0, 'rgba(200,220,255,0)');
+          grad.addColorStop(0.6, 'rgba(200,220,255,' + s.life * 0.4 + ')');
+          grad.addColorStop(1, 'rgba(255,255,255,' + s.life + ')');
+
+          ctx.beginPath();
+          ctx.moveTo(tailX, tailY);
+          ctx.lineTo(s.x, s.y);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = s.width;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          // Bright head
+          const headGlow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 4);
+          headGlow.addColorStop(0, 'rgba(255,255,255,' + s.life + ')');
+          headGlow.addColorStop(1, 'rgba(200,220,255,0)');
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = headGlow;
+          ctx.fill();
+        }
+
+      // ---- LIGHT MODE: Colorful floating bubbles ----
+      } else {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+
+          // Gentle pulsing
+          p.twinklePhase += p.twinkleSpeed;
+          const pulse = 0.8 + Math.sin(p.twinklePhase) * 0.2;
+          const r = p.r * pulse;
+
+          // Soft colored bubble with glow
+          const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+          gradient.addColorStop(0, 'hsla(' + p.hue + ',60%,65%,0.25)');
+          gradient.addColorStop(0.5, 'hsla(' + p.hue + ',50%,70%,0.08)');
+          gradient.addColorStop(1, 'hsla(' + p.hue + ',50%,70%,0)');
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+
+          // Core dot
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = 'hsla(' + p.hue + ',55%,60%,0.45)';
+          ctx.fill();
+
+          // Connect nearby
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              const midHue = (p.hue + q.hue) / 2;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'hsla(' + midHue + ',40%,60%,' + (1 - dist / 120) * 0.15 + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+
+          // Connect to mouse
+          if (mouse.x !== null) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 200) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.strokeStyle = 'hsla(' + p.hue + ',50%,55%,' + (1 - dist / 200) * 0.25 + ')';
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -105,7 +307,7 @@
       requestAnimationFrame(draw);
     }
 
-    draw();
+    requestAnimationFrame(draw);
   }
 
   // ===================== MOUSE GLOW =====================
@@ -113,10 +315,9 @@
     const glow = document.createElement('div');
     glow.id = 'mouse-glow';
     glow.style.cssText =
-      'position:fixed;width:300px;height:300px;border-radius:50%;pointer-events:none;' +
+      'position:fixed;width:350px;height:350px;border-radius:50%;pointer-events:none;' +
       'z-index:0;transform:translate(-50%,-50%);' +
-      'transition:opacity 0.3s ease;opacity:0;' +
-      'background:radial-gradient(circle,rgba(120,100,255,0.12) 0%,rgba(120,100,255,0) 70%);';
+      'transition:opacity 0.3s ease;opacity:0;';
     document.body.appendChild(glow);
 
     let visible = false;
@@ -135,19 +336,17 @@
       visible = false;
     });
 
-    // Adapt glow color to dark mode
     function updateGlowColor() {
-      const dark =
-        document.documentElement.getAttribute('data-theme') === 'dark' ||
-        document.body.classList.contains('dark') ||
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
-      glow.style.background = dark
-        ? 'radial-gradient(circle,rgba(160,140,255,0.15) 0%,rgba(160,140,255,0) 70%)'
-        : 'radial-gradient(circle,rgba(100,80,220,0.1) 0%,rgba(100,80,220,0) 70%)';
+      if (isDark()) {
+        glow.style.background =
+          'radial-gradient(circle, rgba(120,130,255,0.18) 0%, rgba(80,100,200,0.06) 40%, rgba(120,130,255,0) 70%)';
+      } else {
+        glow.style.background =
+          'radial-gradient(circle, rgba(120,80,240,0.12) 0%, rgba(100,60,200,0.04) 40%, rgba(120,80,240,0) 70%)';
+      }
     }
 
     updateGlowColor();
-    // Watch for theme changes
     const observer = new MutationObserver(updateGlowColor);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
@@ -156,10 +355,12 @@
   // ===================== INIT =====================
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
+      initGradientBg();
       initParticles();
       initMouseGlow();
     });
   } else {
+    initGradientBg();
     initParticles();
     initMouseGlow();
   }
