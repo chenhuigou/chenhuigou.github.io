@@ -25,7 +25,12 @@
 .typewriter-container {
   margin: 0.5rem 0 1rem 0;
   line-height: 1.6;
-  clear: both;
+}
+
+@media (min-width: 576px) {
+  .typewriter-container {
+    max-width: 65%;
+  }
 }
 
 .typewriter-text {
