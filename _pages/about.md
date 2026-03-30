@@ -32,4 +32,6 @@ I am a PhD student at [Monash University](https://www.monash.edu/), also working
 <span class="typewriter-text">Designing evolving agents while evolving myself.</span>
 <br>
 <span class="typewriter-text">AI Agents · LLMs · VLMs · Generative AI</span>
+<br>
+<span class="typewriter-text">Data · Model · Agent · Evaluation</span>
 </div>
