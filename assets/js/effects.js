@@ -352,46 +352,39 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
-  // ===================== TYPEWRITER =====================
+  // ===================== TYPEWRITER (TWO LINES) =====================
   function initTypewriter() {
-    const el = document.getElementById('typewriter');
-    if (!el) return;
+    var line1El = document.getElementById('typewriter-line1');
+    var line2El = document.getElementById('typewriter-line2');
+    var cursor1 = document.getElementById('cursor1');
+    var cursor2 = document.getElementById('cursor2');
+    if (!line1El || !line2El) return;
 
-    const phrases = [
-      'Designing evolving agents while evolving myself.',
-      'AI Agents · LLMs · VLMs · Generative AI',
-      'From Melbourne to the world 🌏',
-      'Building the future, one model at a time.',
-    ];
+    var line1 = 'Designing evolving agents while evolving myself.';
+    var line2 = 'AI Agents · LLMs · VLMs · Generative AI';
+    var typeSpeed = 55;
 
-    let phraseIdx = 0, charIdx = 0, deleting = false;
-    const typeSpeed = 60, deleteSpeed = 35, pauseEnd = 2000, pauseStart = 500;
-
-    function tick() {
-      const current = phrases[phraseIdx];
-
-      if (!deleting) {
-        el.textContent = current.substring(0, charIdx + 1);
-        charIdx++;
-        if (charIdx === current.length) {
-          setTimeout(function () { deleting = true; tick(); }, pauseEnd);
-          return;
-        }
-        setTimeout(tick, typeSpeed);
-      } else {
-        el.textContent = current.substring(0, charIdx - 1);
-        charIdx--;
-        if (charIdx === 0) {
-          deleting = false;
-          phraseIdx = (phraseIdx + 1) % phrases.length;
-          setTimeout(tick, pauseStart);
-          return;
-        }
-        setTimeout(tick, deleteSpeed);
+    function typeLine(el, text, idx, callback) {
+      if (idx <= text.length) {
+        el.textContent = text.substring(0, idx);
+        setTimeout(function () { typeLine(el, text, idx + 1, callback); }, typeSpeed);
+      } else if (callback) {
+        callback();
       }
     }
 
-    setTimeout(tick, 800);
+    setTimeout(function () {
+      typeLine(line1El, line1, 0, function () {
+        // Line 1 done, move cursor to line 2
+        cursor1.style.display = 'none';
+        cursor2.style.display = 'inline';
+        setTimeout(function () {
+          typeLine(line2El, line2, 0, function () {
+            // Both done, keep cursor blinking
+          });
+        }, 400);
+      });
+    }, 600);
   }
 
   // ===================== SCROLL REVEAL =====================
