@@ -25,7 +25,6 @@
 .typewriter-container {
   margin: 0.5rem 0 1rem 0;
   line-height: 1.6;
-  overflow: hidden; /* create BFC so text doesn't flow under float */
 }
 
 .typewriter-text {
