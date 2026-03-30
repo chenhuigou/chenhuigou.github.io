@@ -352,16 +352,107 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
+  // ===================== TYPEWRITER =====================
+  function initTypewriter() {
+    const el = document.getElementById('typewriter');
+    if (!el) return;
+
+    const phrases = [
+      'Designing evolving agents while evolving myself.',
+      'AI Agents · LLMs · VLMs · Generative AI',
+      'From Melbourne to the world 🌏',
+      'Building the future, one model at a time.',
+    ];
+
+    let phraseIdx = 0, charIdx = 0, deleting = false;
+    const typeSpeed = 60, deleteSpeed = 35, pauseEnd = 2000, pauseStart = 500;
+
+    function tick() {
+      const current = phrases[phraseIdx];
+
+      if (!deleting) {
+        el.textContent = current.substring(0, charIdx + 1);
+        charIdx++;
+        if (charIdx === current.length) {
+          setTimeout(function () { deleting = true; tick(); }, pauseEnd);
+          return;
+        }
+        setTimeout(tick, typeSpeed);
+      } else {
+        el.textContent = current.substring(0, charIdx - 1);
+        charIdx--;
+        if (charIdx === 0) {
+          deleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+          setTimeout(tick, pauseStart);
+          return;
+        }
+        setTimeout(tick, deleteSpeed);
+      }
+    }
+
+    setTimeout(tick, 800);
+  }
+
+  // ===================== SCROLL REVEAL =====================
+  function initScrollReveal() {
+    const els = document.querySelectorAll('.scroll-reveal');
+    if (!els.length) return;
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    els.forEach(function (el, i) {
+      el.style.transitionDelay = (i * 0.1) + 's';
+      observer.observe(el);
+    });
+  }
+
+  // ===================== 3D TILT =====================
+  function initTilt3D() {
+    var containers = document.querySelectorAll('.tilt-3d');
+    containers.forEach(function (container) {
+      var img = container.querySelector('img');
+      if (!img) return;
+
+      container.addEventListener('mousemove', function (e) {
+        var rect = container.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width;
+        var y = (e.clientY - rect.top) / rect.height;
+        var rotateY = (x - 0.5) * 20;
+        var rotateX = (0.5 - y) * 20;
+        img.style.transform =
+          'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale(1.05)';
+      });
+
+      container.addEventListener('mouseleave', function () {
+        img.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+  }
+
   // ===================== INIT =====================
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initGradientBg();
       initParticles();
       initMouseGlow();
+      initTypewriter();
+      initScrollReveal();
+      initTilt3D();
     });
   } else {
     initGradientBg();
     initParticles();
     initMouseGlow();
+    initTypewriter();
+    initScrollReveal();
+    initTilt3D();
   }
 })();

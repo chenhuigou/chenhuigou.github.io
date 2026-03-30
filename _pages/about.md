@@ -28,4 +28,4 @@ latest_posts:
 
 I am a PhD student at [Monash University](https://www.monash.edu/), also working with [ByteDance Seed Edge](https://www.bytedance.com/). My research focuses on AI Agents, Large Language Models (LLMs), Vision-Language Models (VLMs), and Generative AI.
 
-**_Designing evolving agents while evolving myself._**
+<span id="typewriter" class="typewriter-text"></span><span class="typewriter-cursor">|</span>
