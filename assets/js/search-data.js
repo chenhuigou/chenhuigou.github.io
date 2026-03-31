@@ -63,8 +63,8 @@ ninja.data = [{
           description: "",
           section: "Books",handler: () => {
               window.location.href = "/books/the_godfather/";
-            },},{id: "news-bagel-emerging-properties-in-unified-multimodal-pretraining-released-reaching-5-5k-github-stars",
-          title: 'BAGEL (Emerging Properties in Unified Multimodal Pretraining) released, reaching 5.5k GitHub stars.',
+            },},{id: "news-bagel-emerging-properties-in-unified-multimodal-pretraining-released-reaching-5-7k-github-stars",
+          title: 'BAGEL (Emerging Properties in Unified Multimodal Pretraining) released, reaching 5.7k+ GitHub stars.',
           description: "",
           section: "News",},{id: "news-two-papers-accepted-at-cvpr-2026-vq-va-world-and-an-empirical-study-on-how-video-llms-answer-video-questions",
           title: 'Two papers accepted at CVPR 2026: VQ-VA World and An Empirical Study on...',
