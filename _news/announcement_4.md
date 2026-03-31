@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-**BAGEL** (Emerging Properties in Unified Multimodal Pretraining) released, reaching 5.5k GitHub stars.
+**[BAGEL](https://github.com/bytedance-seed/BAGEL)** (Emerging Properties in Unified Multimodal Pretraining) released, reaching **5.7k+ GitHub stars**.
