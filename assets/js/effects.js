@@ -441,7 +441,7 @@
 
     // Config
     var CHAR_SET = '.,:;+*=#@%&';
-    var FONT_SIZE = 14;
+    var FONT_SIZE = 10;
     var DISPLAY_TEXT = 'CHENHUI GOU';
     var MOUSE_RADIUS = 80;
     var RETURN_SPEED = 0.06;
@@ -482,9 +482,9 @@
     function buildParticles() {
       particles = [];
 
-      // Measure text to center it
-      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.65)), 72);
-      if (measureSize < 20) measureSize = 20;
+      // Measure text to center it — use large bold font for clear shape
+      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.55)), 120);
+      if (measureSize < 36) measureSize = 36;
 
       // Use offscreen canvas to sample text shape
       var offCanvas = document.createElement('canvas');
@@ -493,15 +493,15 @@
       var offCtx = offCanvas.getContext('2d');
 
       offCtx.fillStyle = '#000';
-      offCtx.font = '900 ' + measureSize + 'px "Courier New", monospace';
+      offCtx.font = '900 ' + measureSize + 'px "Arial Black", "Helvetica Neue", Arial, sans-serif';
       offCtx.textAlign = 'center';
       offCtx.textBaseline = 'middle';
       offCtx.fillText(DISPLAY_TEXT, w / 2, h / 2);
 
-      // Sample pixels
+      // Sample pixels — smaller step = denser particles = clearer text
       var imageData = offCtx.getImageData(0, 0, w, h);
       var data = imageData.data;
-      var step = Math.max(Math.floor(FONT_SIZE * 0.7), 6);
+      var step = Math.max(Math.floor(FONT_SIZE * 0.55), 4);
 
       for (var y = 0; y < h; y += step) {
         for (var x = 0; x < w; x += step) {
@@ -516,7 +516,7 @@
               originX: x,
               originY: y,
               char: CHAR_SET[charIdx],
-              size: FONT_SIZE * (0.7 + Math.random() * 0.6),
+              size: FONT_SIZE * (0.8 + Math.random() * 0.4),
               colorIdx: Math.floor(Math.random() * 5),
               vx: 0,
               vy: 0,
