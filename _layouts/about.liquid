@@ -71,31 +71,11 @@ layout: default
       </div>
     {% endif %}
 
-    <!-- Visitor Map (lazy-loaded on scroll) -->
-    <div class="scroll-reveal visitor-map" id="visitor-map-container" style="text-align: center; margin-top: 2rem; margin-bottom: 1rem; min-height: 200px;">
+    <!-- Visitor Map -->
+    <div class="scroll-reveal visitor-map" style="text-align: center; margin-top: 2rem; margin-bottom: 1rem;">
       <h2>🌍 visitors</h2>
-      <noscript>
-        <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=3MJjWDTnpLBZpvJ-FgNST-WSCY7Ply-Eu3DiSpBYoZU&cl=ffffff&w=a"></script>
-      </noscript>
+      <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=3MJjWDTnpLBZpvJ-FgNST-WSCY7Ply-Eu3DiSpBYoZU&cl=ffffff&w=a"></script>
     </div>
-    <script>
-    (function() {
-      var loaded = false;
-      var container = document.getElementById('visitor-map-container');
-      if (!container) return;
-      var observer = new IntersectionObserver(function(entries) {
-        if (entries[0].isIntersecting && !loaded) {
-          loaded = true;
-          observer.disconnect();
-          var s = document.createElement('script');
-          s.src = '//clustrmaps.com/map_v2.js?d=3MJjWDTnpLBZpvJ-FgNST-WSCY7Ply-Eu3DiSpBYoZU&cl=ffffff&w=a';
-          s.id = 'clustrmaps';
-          container.appendChild(s);
-        }
-      }, { rootMargin: '200px' });
-      observer.observe(container);
-    })();
-    </script>
 
     <!-- Social -->
     {% if page.social %}
