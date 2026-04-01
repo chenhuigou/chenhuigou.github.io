@@ -482,15 +482,27 @@
     function buildParticles() {
       particles = [];
 
-      // Measure text to center it — use large bold font for clear shape
-      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.82)), 90);
-      if (measureSize < 24) measureSize = 24;
-
-      // Use offscreen canvas to sample text shape
+      // Measure text to center it — measure actual text width and fit
       var offCanvas = document.createElement('canvas');
       offCanvas.width = w;
       offCanvas.height = h;
       var offCtx = offCanvas.getContext('2d');
+
+      // Binary search for the largest font that fits with 20px padding each side
+      var maxW = w - 40;
+      var maxH = h - 20;
+      var lo = 16, hi = 150, measureSize = 40;
+      while (lo <= hi) {
+        var mid = Math.floor((lo + hi) / 2);
+        offCtx.font = '900 ' + mid + 'px "Arial Black", "Helvetica Neue", Arial, sans-serif';
+        var tw = offCtx.measureText(DISPLAY_TEXT).width;
+        if (tw <= maxW && mid <= maxH) {
+          measureSize = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
 
       offCtx.fillStyle = '#000';
       offCtx.font = '900 ' + measureSize + 'px "Arial Black", "Helvetica Neue", Arial, sans-serif';
