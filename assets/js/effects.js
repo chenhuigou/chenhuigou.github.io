@@ -506,9 +506,13 @@
 
       offCtx.fillStyle = '#000';
       offCtx.font = '900 ' + measureSize + 'px "Arial Black", "Helvetica Neue", Arial, sans-serif';
-      offCtx.textAlign = 'center';
+      // Manually center: measure actual width and compute offset
+      var textMetrics = offCtx.measureText(DISPLAY_TEXT);
+      var textW = textMetrics.width;
+      var startX = (w - textW) / 2;
+      offCtx.textAlign = 'left';
       offCtx.textBaseline = 'middle';
-      offCtx.fillText(DISPLAY_TEXT, w / 2, h / 2);
+      offCtx.fillText(DISPLAY_TEXT, startX, h / 2);
 
       // Sample pixels — smaller step = denser particles = clearer text
       var imageData = offCtx.getImageData(0, 0, w, h);
