@@ -483,8 +483,8 @@
       particles = [];
 
       // Measure text to center it — use large bold font for clear shape
-      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.55)), 120);
-      if (measureSize < 36) measureSize = 36;
+      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.68)), 100);
+      if (measureSize < 28) measureSize = 28;
 
       // Use offscreen canvas to sample text shape
       var offCanvas = document.createElement('canvas');
@@ -664,11 +664,11 @@
             [80, 130, 250],  // blue
             [230, 100, 180], // pink
           ];
-      var alphaRange = dark ? [0.15, 0.25] : [0.12, 0.2];
+      var alphaRange = dark ? [0.2, 0.35] : [0.15, 0.28];
 
       var orbs = [];
       for (var i = 0; i < 3; i++) {
-        var r = 60 + Math.random() * 60;
+        var r = 80 + Math.random() * 80;
         orbs.push({
           x: r + Math.random() * (w - 2 * r),
           y: r + Math.random() * (h - 2 * r),

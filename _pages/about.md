@@ -99,10 +99,6 @@ body.dark .chip-cyan { background: rgba(34,211,238,0.15); border-color: rgba(34,
 
 <div class="research-chips">
   <span class="chip chip-purple">AI Agents</span>
-  <span class="chip chip-blue">LLM</span>
-  <span class="chip chip-indigo">VLM</span>
-  <span class="chip chip-pink">Generative AI</span>
-  <span class="chip chip-teal">Video Understanding</span>
-  <span class="chip chip-orange">World Model</span>
-  <span class="chip chip-cyan">Multimodal</span>
+  <span class="chip chip-blue">Foundation LLM/VLM</span>
+  <span class="chip chip-pink">Generative Model</span>
 </div>
