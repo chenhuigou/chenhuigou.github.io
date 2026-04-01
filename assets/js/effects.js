@@ -2,6 +2,7 @@
  * 1. Particle Background with shooting stars (dark) / floating bubbles (light)
  * 2. Mouse Cursor Glow Effect
  * 3. Flowing Gradient Background
+ * 4. ASCII Particle Hero Animation
  */
 
 (function () {
@@ -430,12 +431,198 @@
     });
   }
 
+  // ===================== ASCII PARTICLE HERO =====================
+  function initAsciiHero() {
+    var canvas = document.getElementById('ascii-hero');
+    if (!canvas) return;
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Config
+    var CHAR_SET = '.,:;+*=#@%&';
+    var FONT_SIZE = 14;
+    var DISPLAY_TEXT = 'CHENHUI GOU';
+    var MOUSE_RADIUS = 80;
+    var RETURN_SPEED = 0.06;
+    var PUSH_FORCE = 8;
+
+    var particles = [];
+    var mouse = { x: -9999, y: -9999, active: false };
+    var dpr = window.devicePixelRatio || 1;
+    var w, h;
+
+    // Style
+    canvas.style.width = '100%';
+    canvas.style.height = '150px';
+    canvas.style.display = 'block';
+    canvas.style.marginBottom = '16px';
+    canvas.style.cursor = 'default';
+
+    function getColors() {
+      var dark = isDark();
+      return {
+        chars: dark
+          ? ['#60a5fa', '#818cf8', '#67e8f9', '#a78bfa', '#38bdf8']
+          : ['#6d28d9', '#4f46e5', '#7c3aed', '#3b82f6', '#6366f1'],
+        bg: 'transparent'
+      };
+    }
+
+    function resize() {
+      var rect = canvas.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildParticles();
+    }
+
+    function buildParticles() {
+      particles = [];
+
+      // Measure text to center it
+      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.65)), 72);
+      if (measureSize < 20) measureSize = 20;
+
+      // Use offscreen canvas to sample text shape
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = w;
+      offCanvas.height = h;
+      var offCtx = offCanvas.getContext('2d');
+
+      offCtx.fillStyle = '#000';
+      offCtx.font = '900 ' + measureSize + 'px "Courier New", monospace';
+      offCtx.textAlign = 'center';
+      offCtx.textBaseline = 'middle';
+      offCtx.fillText(DISPLAY_TEXT, w / 2, h / 2);
+
+      // Sample pixels
+      var imageData = offCtx.getImageData(0, 0, w, h);
+      var data = imageData.data;
+      var step = Math.max(Math.floor(FONT_SIZE * 0.7), 6);
+
+      for (var y = 0; y < h; y += step) {
+        for (var x = 0; x < w; x += step) {
+          var idx = (y * w + x) * 4;
+          var alpha = data[idx + 3];
+          if (alpha > 128) {
+            var brightness = data[idx] / 255;
+            var charIdx = Math.floor(Math.random() * CHAR_SET.length);
+            particles.push({
+              x: x,
+              y: y,
+              originX: x,
+              originY: y,
+              char: CHAR_SET[charIdx],
+              size: FONT_SIZE * (0.7 + Math.random() * 0.6),
+              colorIdx: Math.floor(Math.random() * 5),
+              vx: 0,
+              vy: 0,
+              friction: 0.85 + Math.random() * 0.1
+            });
+          }
+        }
+      }
+    }
+
+    canvas.addEventListener('mousemove', function (e) {
+      var rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.active = true;
+    });
+
+    canvas.addEventListener('mouseleave', function () {
+      mouse.active = false;
+    });
+
+    // Touch support
+    canvas.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+      var touch = e.touches[0];
+      var rect = canvas.getBoundingClientRect();
+      mouse.x = touch.clientX - rect.left;
+      mouse.y = touch.clientY - rect.top;
+      mouse.active = true;
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', function () {
+      mouse.active = false;
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      var colors = getColors();
+
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+
+        // Mouse interaction
+        if (mouse.active) {
+          var dx = p.x - mouse.x;
+          var dy = p.y - mouse.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_RADIUS && dist > 0) {
+            var force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS * PUSH_FORCE;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+          }
+        }
+
+        // Return to origin
+        p.vx += (p.originX - p.x) * RETURN_SPEED;
+        p.vy += (p.originY - p.y) * RETURN_SPEED;
+
+        // Apply friction
+        p.vx *= p.friction;
+        p.vy *= p.friction;
+
+        // Update position
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Draw character
+        var displacement = Math.sqrt(
+          (p.x - p.originX) * (p.x - p.originX) +
+          (p.y - p.originY) * (p.y - p.originY)
+        );
+        var alpha = Math.min(1, 0.5 + displacement / 30);
+        var color = colors.chars[p.colorIdx];
+
+        ctx.font = '700 ' + p.size + 'px monospace';
+        ctx.fillStyle = color;
+        ctx.globalAlpha = alpha;
+        ctx.fillText(p.char, p.x, p.y);
+      }
+      ctx.globalAlpha = 1;
+
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    requestAnimationFrame(draw);
+
+    window.addEventListener('resize', function () {
+      resize();
+    });
+
+    // Theme change
+    var themeObserver = new MutationObserver(function () {
+      // Colors update automatically in draw loop
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
   // ===================== INIT =====================
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initGradientBg();
       initParticles();
       initMouseGlow();
+      initAsciiHero();
       initTypewriter();
       initScrollReveal();
       initTilt3D();
@@ -444,6 +631,7 @@
     initGradientBg();
     initParticles();
     initMouseGlow();
+    initAsciiHero();
     initTypewriter();
     initScrollReveal();
     initTilt3D();
