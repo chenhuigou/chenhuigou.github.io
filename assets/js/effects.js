@@ -483,8 +483,8 @@
       particles = [];
 
       // Measure text to center it — use large bold font for clear shape
-      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.68)), 100);
-      if (measureSize < 28) measureSize = 28;
+      var measureSize = Math.min(Math.floor(w / (DISPLAY_TEXT.length * 0.82)), 90);
+      if (measureSize < 24) measureSize = 24;
 
       // Use offscreen canvas to sample text shape
       var offCanvas = document.createElement('canvas');
