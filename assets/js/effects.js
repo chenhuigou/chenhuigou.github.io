@@ -452,11 +452,7 @@
     var dpr = window.devicePixelRatio || 1;
     var w, h;
 
-    // Style
-    canvas.style.width = '100%';
-    canvas.style.height = '180px';
-    canvas.style.display = 'block';
-    canvas.style.marginBottom = '16px';
+    // Style (height/width/display set in HTML to reserve space before JS loads)
     canvas.style.cursor = 'default';
 
     function getColors() {
@@ -618,7 +614,11 @@
     }
 
     resize();
-    requestAnimationFrame(draw);
+    // Fade in after first frame renders
+    requestAnimationFrame(function () {
+      draw();
+      canvas.style.opacity = '1';
+    });
 
     window.addEventListener('resize', function () {
       resize();
