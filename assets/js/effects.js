@@ -616,6 +616,217 @@
     themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
+  // ===================== FLOATING ORBS =====================
+  function initFloatingOrbs() {
+    var postEl = document.querySelector('.post');
+    if (!postEl) return;
+
+    // Make .post the positioning context
+    if (getComputedStyle(postEl).position === 'static') {
+      postEl.style.position = 'relative';
+    }
+
+    var canvas = document.createElement('canvas');
+    canvas.id = 'floating-orbs-canvas';
+    canvas.style.cssText =
+      'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+    postEl.insertBefore(canvas, postEl.firstChild);
+
+    var ctx = canvas.getContext('2d');
+    var w, h;
+    var dragging = null;
+    var dragOffsetX = 0, dragOffsetY = 0;
+
+    function resize() {
+      var rect = postEl.getBoundingClientRect();
+      w = canvas.width = rect.width;
+      h = canvas.height = rect.height;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Observe .post size changes
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(resize).observe(postEl);
+    }
+
+    // Orb definitions
+    function makeOrbs() {
+      var dark = isDark();
+      var palettes = dark
+        ? [
+            [60, 130, 250],  // blue
+            [80, 220, 220],  // cyan
+            [140, 100, 240], // purple
+          ]
+        : [
+            [140, 80, 240],  // purple
+            [80, 130, 250],  // blue
+            [230, 100, 180], // pink
+          ];
+      var alphaRange = dark ? [0.15, 0.25] : [0.12, 0.2];
+
+      var orbs = [];
+      for (var i = 0; i < 3; i++) {
+        var r = 60 + Math.random() * 60;
+        orbs.push({
+          x: r + Math.random() * (w - 2 * r),
+          y: r + Math.random() * (h - 2 * r),
+          r: r,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          color: palettes[i % palettes.length],
+          alpha: alphaRange[0] + Math.random() * (alphaRange[1] - alphaRange[0]),
+        });
+      }
+      return orbs;
+    }
+
+    var orbs = makeOrbs();
+
+    // Re-create orbs on theme change
+    var orbObserver = new MutationObserver(function () {
+      orbs = makeOrbs();
+    });
+    orbObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    orbObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Drag support
+    canvas.style.pointerEvents = 'auto';
+
+    function getCanvasXY(e) {
+      var rect = canvas.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      return { x: cx, y: cy };
+    }
+
+    function findOrb(cx, cy) {
+      for (var i = orbs.length - 1; i >= 0; i--) {
+        var o = orbs[i];
+        var dx = cx - o.x, dy = cy - o.y;
+        if (dx * dx + dy * dy < o.r * o.r) return o;
+      }
+      return null;
+    }
+
+    canvas.addEventListener('mousedown', function (e) {
+      var p = getCanvasXY(e);
+      var orb = findOrb(p.x, p.y);
+      if (orb) {
+        dragging = orb;
+        dragOffsetX = p.x - orb.x;
+        dragOffsetY = p.y - orb.y;
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var p = getCanvasXY(e);
+      dragging.x = p.x - dragOffsetX;
+      dragging.y = p.y - dragOffsetY;
+    });
+
+    window.addEventListener('mouseup', function () {
+      if (dragging) {
+        dragging = null;
+        canvas.style.cursor = 'default';
+      }
+    });
+
+    // Touch drag
+    canvas.addEventListener('touchstart', function (e) {
+      var p = getCanvasXY(e);
+      var orb = findOrb(p.x, p.y);
+      if (orb) {
+        dragging = orb;
+        dragOffsetX = p.x - orb.x;
+        dragOffsetY = p.y - orb.y;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', function (e) {
+      if (!dragging) return;
+      var p = getCanvasXY(e);
+      dragging.x = p.x - dragOffsetX;
+      dragging.y = p.y - dragOffsetY;
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', function () {
+      dragging = null;
+    });
+
+    function draw() {
+      resize(); // keep synced
+      ctx.clearRect(0, 0, w, h);
+
+      for (var i = 0; i < orbs.length; i++) {
+        var o = orbs[i];
+
+        // Move (skip if dragging this orb)
+        if (o !== dragging) {
+          o.x += o.vx;
+          o.y += o.vy;
+
+          // Bounce
+          if (o.x - o.r < 0) { o.x = o.r; o.vx = Math.abs(o.vx); }
+          if (o.x + o.r > w) { o.x = w - o.r; o.vx = -Math.abs(o.vx); }
+          if (o.y - o.r < 0) { o.y = o.r; o.vy = Math.abs(o.vy); }
+          if (o.y + o.r > h) { o.y = h - o.r; o.vy = -Math.abs(o.vy); }
+        }
+
+        // Draw radial gradient orb
+        var grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+        var c = o.color;
+        grad.addColorStop(0, 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + o.alpha + ')');
+        grad.addColorStop(0.6, 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (o.alpha * 0.4) + ')');
+        grad.addColorStop(1, 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',0)');
+
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // ===================== CARD GLOW (Publications) =====================
+  function initCardGlow() {
+    var items = document.querySelectorAll('ol.bibliography li');
+    if (!items.length) return;
+
+    function updateGlowColor() {
+      var color = isDark()
+        ? 'rgba(96, 165, 250, 0.15)'
+        : 'rgba(120, 80, 240, 0.12)';
+      items.forEach(function (li) {
+        li.style.setProperty('--glow-color', color);
+      });
+    }
+
+    updateGlowColor();
+
+    items.forEach(function (li) {
+      li.addEventListener('mousemove', function (e) {
+        var rect = li.getBoundingClientRect();
+        li.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        li.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      });
+    });
+
+    var glowObserver = new MutationObserver(updateGlowColor);
+    glowObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    glowObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
   // ===================== INIT =====================
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
@@ -626,6 +837,8 @@
       initTypewriter();
       initScrollReveal();
       initTilt3D();
+      initFloatingOrbs();
+      initCardGlow();
     });
   } else {
     initGradientBg();
@@ -635,5 +848,7 @@
     initTypewriter();
     initScrollReveal();
     initTilt3D();
+    initFloatingOrbs();
+    initCardGlow();
   }
 })();
