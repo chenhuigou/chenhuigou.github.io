@@ -441,11 +441,11 @@
 
     // Config
     var CHAR_SET = '.,:;+*=#@%&';
-    var FONT_SIZE = 10;
+    var FONT_SIZE = 7;
     var DISPLAY_TEXT = 'CHENHUI GOU';
-    var MOUSE_RADIUS = 80;
+    var MOUSE_RADIUS = 60;
     var RETURN_SPEED = 0.06;
-    var PUSH_FORCE = 8;
+    var PUSH_FORCE = 6;
 
     var particles = [];
     var mouse = { x: -9999, y: -9999, active: false };
@@ -454,7 +454,7 @@
 
     // Style
     canvas.style.width = '100%';
-    canvas.style.height = '150px';
+    canvas.style.height = '180px';
     canvas.style.display = 'block';
     canvas.style.marginBottom = '16px';
     canvas.style.cursor = 'default';
@@ -501,7 +501,7 @@
       // Sample pixels — smaller step = denser particles = clearer text
       var imageData = offCtx.getImageData(0, 0, w, h);
       var data = imageData.data;
-      var step = Math.max(Math.floor(FONT_SIZE * 0.55), 4);
+      var step = 3;
 
       for (var y = 0; y < h; y += step) {
         for (var x = 0; x < w; x += step) {
@@ -516,7 +516,7 @@
               originX: x,
               originY: y,
               char: CHAR_SET[charIdx],
-              size: FONT_SIZE * (0.8 + Math.random() * 0.4),
+              size: FONT_SIZE * (0.85 + Math.random() * 0.3),
               colorIdx: Math.floor(Math.random() * 5),
               vx: 0,
               vy: 0,
