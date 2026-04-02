@@ -51,15 +51,23 @@
 }
 
 /* ===================== SCROLL REVEAL ===================== */
+/* Default: visible. Only animate if JS has loaded and marked the page. */
 .scroll-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Once JS is ready, hide elements that haven't been revealed yet */
+.scroll-reveal-ready .scroll-reveal:not(.revealed) {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.scroll-reveal.revealed {
+.scroll-reveal-ready .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 /* ===================== 3D TILT PROFILE ===================== */
