@@ -408,6 +408,23 @@
     });
   }
 
+  // ===================== EXPERIENCE TIMELINE =====================
+  function initTimeline() {
+    var timeline = document.querySelector('.experience-timeline');
+    if (!timeline) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          timeline.classList.add('animated');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    observer.observe(timeline);
+  }
+
   // ===================== 3D TILT =====================
   function initTilt3D() {
     var containers = document.querySelectorAll('.tilt-3d');
@@ -862,6 +879,7 @@
     initAsciiHero();
     initTypewriter();
     initScrollReveal();
+    initTimeline();
     initTilt3D();
     initFloatingOrbs();
     initCardGlow();
