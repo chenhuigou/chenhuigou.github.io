@@ -408,21 +408,64 @@
     });
   }
 
-  // ===================== EXPERIENCE TIMELINE =====================
+  // ===================== HORIZONTAL EXPERIENCE TIMELINE =====================
   function initTimeline() {
-    var timeline = document.querySelector('.experience-timeline');
-    if (!timeline) return;
+    var wrapper = document.querySelector('.h-timeline-wrapper');
+    var scroll = document.getElementById('timeline-scroll');
+    if (!wrapper || !scroll) return;
 
+    // Drag to scroll
+    var isDragging = false;
+    var startX = 0;
+    var scrollLeft = 0;
+
+    scroll.addEventListener('mousedown', function (e) {
+      isDragging = true;
+      startX = e.pageX - scroll.offsetLeft;
+      scrollLeft = scroll.scrollLeft;
+      scroll.style.cursor = 'grabbing';
+    });
+
+    scroll.addEventListener('mouseleave', function () {
+      isDragging = false;
+      scroll.style.cursor = 'grab';
+    });
+
+    scroll.addEventListener('mouseup', function () {
+      isDragging = false;
+      scroll.style.cursor = 'grab';
+    });
+
+    scroll.addEventListener('mousemove', function (e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      var x = e.pageX - scroll.offsetLeft;
+      var walk = (x - startX) * 1.5;
+      scroll.scrollLeft = scrollLeft - walk;
+      wrapper.classList.add('dragged');
+    });
+
+    // Touch support (mobile)
+    scroll.addEventListener('touchstart', function () {
+      wrapper.classList.add('dragged');
+    }, { passive: true });
+
+    // Scroll to show latest (rightmost) initially
+    requestAnimationFrame(function () {
+      scroll.scrollLeft = scroll.scrollWidth;
+    });
+
+    // Animate on scroll into view
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          timeline.classList.add('animated');
+          wrapper.classList.add('animated');
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
-    observer.observe(timeline);
+    observer.observe(wrapper);
   }
 
   // ===================== 3D TILT =====================
