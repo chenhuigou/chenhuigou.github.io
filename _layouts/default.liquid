@@ -17,6 +17,8 @@
 
   <!-- Body -->
   <body class="{% if site.navbar_fixed %}fixed-top-nav{% endif %} {% unless site.footer_fixed %}sticky-bottom-footer{% endunless %}">
+    <!-- Loading screen: covers page until all effects are initialized -->
+    <div id="page-loading-screen"></div>
     <!-- Header -->
     {% include header.liquid %}
 

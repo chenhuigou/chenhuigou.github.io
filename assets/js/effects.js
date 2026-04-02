@@ -393,19 +393,6 @@
     const els = document.querySelectorAll('.scroll-reveal');
     if (!els.length) return;
 
-    // Step 1: Immediately reveal elements already in viewport (no animation)
-    els.forEach(function (el) {
-      var rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        el.classList.add('revealed');
-      }
-    });
-
-    // Step 2: Enable the animation class on body so future scrolls animate
-    document.body.classList.add('scroll-reveal-ready');
-
-    // Step 3: Observe remaining unrevealed elements
-    var delayIndex = 0;
     const observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -415,12 +402,9 @@
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    els.forEach(function (el) {
-      if (!el.classList.contains('revealed')) {
-        el.style.transitionDelay = (delayIndex * 0.1) + 's';
-        delayIndex++;
-        observer.observe(el);
-      }
+    els.forEach(function (el, i) {
+      el.style.transitionDelay = (i * 0.1) + 's';
+      observer.observe(el);
     });
   }
 
@@ -859,20 +843,19 @@
     glowObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
+  // ===================== REMOVE LOADING SCREEN =====================
+  function removeLoadingScreen() {
+    var screen = document.getElementById('page-loading-screen');
+    if (screen) {
+      screen.classList.add('loaded');
+      setTimeout(function () {
+        if (screen.parentNode) screen.parentNode.removeChild(screen);
+      }, 500);
+    }
+  }
+
   // ===================== INIT =====================
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      initGradientBg();
-      initParticles();
-      initMouseGlow();
-      initAsciiHero();
-      initTypewriter();
-      initScrollReveal();
-      initTilt3D();
-      initFloatingOrbs();
-      initCardGlow();
-    });
-  } else {
+  function initAll() {
     initGradientBg();
     initParticles();
     initMouseGlow();
@@ -882,5 +865,21 @@
     initTilt3D();
     initFloatingOrbs();
     initCardGlow();
+
+    // Wait one frame so all effects render, then reveal
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        removeLoadingScreen();
+      });
+    });
   }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+
+  // Safety fallback: if something breaks, still show the page after 3s
+  setTimeout(removeLoadingScreen, 3000);
 })();

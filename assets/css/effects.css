@@ -1,3 +1,30 @@
+/* ===================== PAGE LOADING SCREEN ===================== */
+/* Covers entire page until all effects are ready */
+#page-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  transition: opacity 0.4s ease;
+}
+
+/* Match theme colors */
+html[data-theme="dark"] #page-loading-screen,
+html:not([data-theme]) #page-loading-screen {
+  background: var(--global-bg-color, #0a0a1a);
+}
+
+html[data-theme="light"] #page-loading-screen {
+  background: var(--global-bg-color, #ffffff);
+}
+
+#page-loading-screen.loaded {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ===================== SHIMMER NAME ===================== */
 .shimmer-text {
   background: linear-gradient(
@@ -51,23 +78,15 @@
 }
 
 /* ===================== SCROLL REVEAL ===================== */
-/* Default: visible. Only animate if JS has loaded and marked the page. */
 .scroll-reveal {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Once JS is ready, hide elements that haven't been revealed yet */
-.scroll-reveal-ready .scroll-reveal:not(.revealed) {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.scroll-reveal-ready .scroll-reveal.revealed {
+.scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 /* ===================== 3D TILT PROFILE ===================== */
