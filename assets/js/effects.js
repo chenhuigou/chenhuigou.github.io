@@ -353,6 +353,124 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
+  // ===================== MOUSE PARTICLE TRAIL =====================
+  function initMouseTrail() {
+    var canvas = document.createElement('canvas');
+    canvas.id = 'mouse-trail-canvas';
+    canvas.style.cssText =
+      'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;';
+    document.body.appendChild(canvas);
+
+    var ctx = canvas.getContext('2d');
+    var tw, th;
+    var trailParticles = [];
+    var mouseX = -9999, mouseY = -9999;
+    var lastX = -9999, lastY = -9999;
+    var isMouseOnPage = false;
+
+    function resizeTrail() {
+      tw = canvas.width = window.innerWidth;
+      th = canvas.height = window.innerHeight;
+    }
+    resizeTrail();
+    window.addEventListener('resize', resizeTrail);
+
+    document.addEventListener('mousemove', function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      isMouseOnPage = true;
+
+      // Spawn particles along mouse path
+      var dx = mouseX - lastX;
+      var dy = mouseY - lastY;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Only spawn if mouse moved enough
+      if (dist > 3) {
+        var steps = Math.min(Math.floor(dist / 4), 6);
+        for (var s = 0; s < steps; s++) {
+          var t = s / steps;
+          var px = lastX + dx * t;
+          var py = lastY + dy * t;
+
+          trailParticles.push({
+            x: px + (Math.random() - 0.5) * 8,
+            y: py + (Math.random() - 0.5) * 8,
+            vx: (Math.random() - 0.5) * 1.5 + dx * 0.02,
+            vy: (Math.random() - 0.5) * 1.5 + dy * 0.02 - 0.5,
+            life: 1,
+            decay: 0.015 + Math.random() * 0.02,
+            size: 1.5 + Math.random() * 3,
+            hue: 230 + Math.random() * 60, // blue-purple range
+          });
+        }
+        lastX = mouseX;
+        lastY = mouseY;
+      }
+
+      // Limit particle count
+      if (trailParticles.length > 200) {
+        trailParticles.splice(0, trailParticles.length - 200);
+      }
+    });
+
+    document.addEventListener('mouseleave', function () {
+      isMouseOnPage = false;
+    });
+
+    document.addEventListener('mouseenter', function (e) {
+      isMouseOnPage = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+
+    function drawTrail() {
+      ctx.clearRect(0, 0, tw, th);
+      var dark = isDark();
+
+      for (var i = trailParticles.length - 1; i >= 0; i--) {
+        var p = trailParticles[i];
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy -= 0.02; // slight upward drift
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        p.life -= p.decay;
+        p.size *= 0.995;
+
+        if (p.life <= 0) {
+          trailParticles.splice(i, 1);
+          continue;
+        }
+
+        var alpha = p.life * (dark ? 0.8 : 0.6);
+        var sat = dark ? '70%' : '60%';
+        var light = dark ? '70%' : '55%';
+
+        // Outer glow
+        var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+        grad.addColorStop(0, 'hsla(' + p.hue + ',' + sat + ',' + light + ',' + alpha * 0.5 + ')');
+        grad.addColorStop(0.5, 'hsla(' + p.hue + ',' + sat + ',' + light + ',' + alpha * 0.15 + ')');
+        grad.addColorStop(1, 'hsla(' + p.hue + ',' + sat + ',' + light + ',0)');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Bright core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'hsla(' + p.hue + ',80%,90%,' + alpha + ')';
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawTrail);
+    }
+
+    requestAnimationFrame(drawTrail);
+  }
+
   // ===================== TYPEWRITER (TWO LINES) =====================
   function initTypewriter() {
     var line1El = document.getElementById('typewriter-line1');
@@ -919,6 +1037,7 @@
     initGradientBg();
     initParticles();
     initMouseGlow();
+    initMouseTrail();
     initAsciiHero();
     initTypewriter();
     initScrollReveal();
