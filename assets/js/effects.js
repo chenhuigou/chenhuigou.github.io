@@ -823,7 +823,7 @@
     var canvas = document.createElement('canvas');
     canvas.id = 'floating-orbs-canvas';
     canvas.style.cssText =
-      'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+      'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;';
     postEl.insertBefore(canvas, postEl.firstChild);
 
     var ctx = canvas.getContext('2d');
@@ -885,8 +885,8 @@
     orbObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     orbObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    // Drag support
-    canvas.style.pointerEvents = 'auto';
+    // Drag support — use document-level events so canvas stays pointer-events:none
+    // and doesn't block other interactive elements (like ASCII hero)
 
     function getCanvasXY(e) {
       var rect = canvas.getBoundingClientRect();
@@ -904,53 +904,25 @@
       return null;
     }
 
-    canvas.addEventListener('mousedown', function (e) {
-      var p = getCanvasXY(e);
-      var orb = findOrb(p.x, p.y);
-      if (orb) {
-        dragging = orb;
-        dragOffsetX = p.x - orb.x;
-        dragOffsetY = p.y - orb.y;
-        canvas.style.cursor = 'grabbing';
-        e.preventDefault();
-      }
-    });
-
-    window.addEventListener('mousemove', function (e) {
+    // Mouse is tracked globally; orbs react to proximity without needing click
+    document.addEventListener('mousemove', function (e) {
       if (!dragging) return;
       var p = getCanvasXY(e);
       dragging.x = p.x - dragOffsetX;
       dragging.y = p.y - dragOffsetY;
     });
 
-    window.addEventListener('mouseup', function () {
-      if (dragging) {
-        dragging = null;
-        canvas.style.cursor = 'default';
-      }
-    });
-
-    // Touch drag
-    canvas.addEventListener('touchstart', function (e) {
+    document.addEventListener('mousedown', function (e) {
       var p = getCanvasXY(e);
       var orb = findOrb(p.x, p.y);
       if (orb) {
         dragging = orb;
         dragOffsetX = p.x - orb.x;
         dragOffsetY = p.y - orb.y;
-        e.preventDefault();
       }
-    }, { passive: false });
+    });
 
-    canvas.addEventListener('touchmove', function (e) {
-      if (!dragging) return;
-      var p = getCanvasXY(e);
-      dragging.x = p.x - dragOffsetX;
-      dragging.y = p.y - dragOffsetY;
-      e.preventDefault();
-    }, { passive: false });
-
-    canvas.addEventListener('touchend', function () {
+    document.addEventListener('mouseup', function () {
       dragging = null;
     });
 
