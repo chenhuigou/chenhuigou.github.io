@@ -6,9 +6,54 @@
 
 .navbar {
   box-shadow: none;
-  border-bottom: 1px solid var(--global-divider-color);
-  background-color: var(--global-bg-color);
-  opacity: 0.95;
+  border-bottom: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  position: relative;
+
+  // Animated gradient border at bottom
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #6366f1, #a78bfa, #8b5cf6, transparent);
+    background-size: 200% 100%;
+    animation: navBorderShimmer 4s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  // Scrolled state
+  &.scrolled {
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+  }
+}
+
+@keyframes navBorderShimmer {
+  0%, 100% { background-position: 200% center; }
+  50% { background-position: -200% center; }
+}
+
+// Dark mode navbar
+html[data-theme='dark'] .navbar {
+  background: rgba(10, 10, 26, 0.6);
+
+  &.scrolled {
+    background: rgba(10, 10, 26, 0.85);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  &::after {
+    background: linear-gradient(90deg, transparent, #818cf8, #a78bfa, #c4b5fd, transparent);
+    background-size: 200% 100%;
+    animation: navBorderShimmer 4s ease-in-out infinite;
+    opacity: 0.5;
+  }
 }
 
 .navbar .dropdown-menu,
@@ -61,9 +106,30 @@
 
   .navbar-nav .nav-item .nav-link {
     color: var(--global-text-color);
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+
+    // Underline glow on hover
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #6366f1, #a78bfa);
+      border-radius: 1px;
+      transition: width 0.3s ease, left 0.3s ease;
+    }
 
     &:hover {
-      color: var(--global-hover-color);
+      color: #6366f1;
+      text-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+
+      &::after {
+        width: 80%;
+        left: 10%;
+      }
     }
   }
 
@@ -71,6 +137,13 @@
     background-color: inherit;
     font-weight: bolder;
     color: var(--global-theme-color);
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
+
+    &::after {
+      width: 80%;
+      left: 10%;
+      opacity: 0.7;
+    }
 
     &:hover {
       color: var(--global-hover-color);

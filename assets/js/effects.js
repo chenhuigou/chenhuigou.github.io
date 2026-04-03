@@ -471,6 +471,28 @@
     requestAnimationFrame(drawTrail);
   }
 
+  // ===================== NAVBAR SCROLL STATE =====================
+  function initNavbarScroll() {
+    var navbar = document.getElementById('navbar');
+    if (!navbar) return;
+
+    var scrolled = false;
+    function checkScroll() {
+      var isScrolled = window.scrollY > 30;
+      if (isScrolled !== scrolled) {
+        scrolled = isScrolled;
+        if (scrolled) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+    }
+
+    window.addEventListener('scroll', checkScroll, { passive: true });
+    checkScroll();
+  }
+
   // ===================== TYPEWRITER (TWO LINES) =====================
   function initTypewriter() {
     var line1El = document.getElementById('typewriter-line1');
@@ -1010,6 +1032,7 @@
     initParticles();
     initMouseGlow();
     initMouseTrail();
+    initNavbarScroll();
     initAsciiHero();
     initTypewriter();
     initScrollReveal();
