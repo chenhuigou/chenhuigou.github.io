@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: PhD Student @ <a href='https://www.monash.edu/'>Monash University</a> / <a href='https://www.bytedance.com/'>ByteDance Seed Edge</a>
+subtitle: PhD Student @ <a href='https://www.monash.edu/'>Monash University</a> &middot; Research Intern @ <a href='https://www.bytedance.com/'>ByteDance Seed Edge</a>
 
 profile:
   align: right
@@ -26,12 +26,12 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
-I am a PhD student at [Monash University](https://www.monash.edu/), also working with [ByteDance Seed Edge](https://www.bytedance.com/). My research focuses on AI Agents, Large Language Models (LLMs), Vision-Language Models (VLMs), and Generative AI.
+I am a PhD student at [Monash University](https://www.monash.edu/) and a research intern with [ByteDance Seed Edge](https://www.bytedance.com/). My work focuses on agentic and multimodal foundation models, especially self-evolving agents, unified multimodal understanding and generation, long-video understanding, and evaluation of multimodal models.
 
 <div class="typewriter-container" style="clear: both;">
-<span class="typewriter-text">Designing evolving agents while evolving myself.</span>
+<span class="typewriter-text">Building AI systems that reason, perceive, and improve.</span>
 <br>
-<span class="typewriter-text">AI Agents · LLMs · VLMs · Generative AI</span>
+<span class="typewriter-text">AI Agents · LLMs · VLMs · Unified Multimodal Models</span>
 </div>
 
 <style>
@@ -99,6 +99,9 @@ body.dark .chip-cyan { background: rgba(34,211,238,0.15); border-color: rgba(34,
 
 <div class="research-chips">
   <span class="chip chip-purple">AI Agents</span>
-  <span class="chip chip-blue">Foundation LLM/VLM</span>
-  <span class="chip chip-pink">Generative Model</span>
+  <span class="chip chip-blue">Self-Evolving AI</span>
+  <span class="chip chip-indigo">Unified Multimodal Models</span>
+  <span class="chip chip-pink">Long Video Understanding</span>
+  <span class="chip chip-teal">Multimodal Evaluation</span>
+  <span class="chip chip-orange">Efficient MLLMs</span>
 </div>
