@@ -44,6 +44,9 @@ ninja.data = [{
           section: "News",},{id: "news-edgebench-released-unveiling-scaling-laws-of-learning-from-real-world-environments",
           title: 'EdgeBench released: unveiling scaling laws of learning from real-world environments.',
           description: "",
+          section: "News",},{id: "news-release-paper-sample-efficient-learning-from-agent-experience",
+          title: 'Release paper: Sample-Efficient Learning from Agent Experience.',
+          description: "",
           section: "News",},{
         id: 'social-email',
         title: 'email',
