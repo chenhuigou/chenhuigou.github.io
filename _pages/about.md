@@ -29,7 +29,7 @@ latest_posts:
 I am a PhD student at [Monash University](https://www.monash.edu/) and a research intern with [ByteDance Seed Edge](https://www.bytedance.com/). My work focuses on agentic and multimodal foundation models, especially self-evolving agents, unified multimodal understanding and generation, long-video understanding, and evaluation of multimodal models.
 
 <div class="typewriter-container" style="clear: both;">
-<span class="typewriter-text">Building AI systems that reason, perceive, and improve.</span>
+<span class="typewriter-text">Working on self evolving AI.</span>
 <br>
 <span class="typewriter-text">AI Agents · LLMs · VLMs · Unified Multimodal Models</span>
 </div>
